@@ -1,5 +1,5 @@
 /**
- * @author mrdoob / http://mrdoob.com/
+ * @author mrdoob / http://mrdoob.com / sheyla.lytt
  */
 
 import { REVISION } from '../constants';
@@ -11,6 +11,7 @@ import { Vector4 } from '../math/Vector4';
 function WebGL2Renderer( parameters ) {
 
 	console.log( 'THREE.WebGL2Renderer', REVISION );
+
 
 	parameters = parameters || {};
 

@@ -22,7 +22,6 @@ import { WebGLTextures } from './webgl/WebGLTextures';
 import { WebGLProperties } from './webgl/WebGLProperties';
 import { WebGLState } from './webgl/WebGLState';
 import { WebGLCapabilities } from './webgl/WebGLCapabilities';
-import { WebVRManager } from './webvr/WebVRManager';
 import { BufferGeometry } from '../core/BufferGeometry';
 import { WebGLExtensions } from './webgl/WebGLExtensions';
 import { Vector3 } from '../math/Vector3';
@@ -290,7 +289,6 @@ function WebGLRenderer( parameters ) {
 	var renderLists = new WebGLRenderLists();
 
 	var background = new WebGLBackground( this, state, objects, _premultipliedAlpha );
-	var vr = new WebVRManager( this );
 
 	this.info.programs = programCache.programs;
 
@@ -334,7 +332,6 @@ function WebGLRenderer( parameters ) {
 	this.properties = properties;
 	this.renderLists = renderLists;
 	this.state = state;
-	this.vr = vr;
 
 	// shadow map
 
@@ -407,15 +404,6 @@ function WebGLRenderer( parameters ) {
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
-
-		var device = vr.getDevice();
-
-		if ( device && device.isPresenting ) {
-
-			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
-			return;
-
-		}
 
 		_width = width;
 		_height = height;
@@ -1085,11 +1073,9 @@ function WebGLRenderer( parameters ) {
 
 			callback();
 
-			( vr.getDevice() || window ).requestAnimationFrame( onFrame );
-
 		}
 
-		( vr.getDevice() || window ).requestAnimationFrame( onFrame );
+		window.requestAnimationFrame( onFrame );
 
 	};
 
