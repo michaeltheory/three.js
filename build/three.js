@@ -1986,6 +1986,94 @@
 	WebGLRenderTargetCube.prototype.isWebGLRenderTargetCube = true;
 
 	/**
+	 * @author szimek / https://github.com/szimek/
+	 * @author alteredq / http://alteredqualia.com/
+	 * @author Marius Kintel / https://github.com/kintel
+	 */
+
+	/*
+	 In options, we can specify:
+	 * Texture parameters for an auto-generated target texture
+	 * depthBuffer/stencilBuffer: Booleans to indicate if we should generate these buffers
+	*/
+	function WebGLMultiRenderTarget( width, height, options ) {
+
+		this.uuid = _Math.generateUUID();
+
+		this.width = width;
+		this.height = height;
+
+		this.scissor = new Vector4( 0, 0, width, height );
+		this.scissorTest = false;
+
+		this.viewport = new Vector4( 0, 0, width, height );
+
+		options = options || {};
+
+		if ( options.minFilter === undefined ) options.minFilter = LinearFilter;
+
+		this.texture = new Texture( undefined, undefined, options.wrapS, options.wrapT, options.magFilter, options.minFilter, options.format, options.type, options.anisotropy, options.encoding );
+
+		this.depthBuffer = options.depthBuffer !== undefined ? options.depthBuffer : true;
+		this.stencilBuffer = options.stencilBuffer !== undefined ? options.stencilBuffer : true;
+		this.depthTexture = options.depthTexture !== undefined ? options.depthTexture : null;
+
+	    this.attachments = [this.texture];
+	}
+
+	Object.assign( WebGLMultiRenderTarget.prototype, EventDispatcher.prototype, {
+
+		isWebGLRenderTarget: true,
+	    isMultiRenderTarget: true,
+
+		setSize: function ( width, height ) {
+
+			if ( this.width !== width || this.height !== height ) {
+
+				this.width = width;
+				this.height = height;
+
+				this.dispose();
+
+			}
+
+			this.viewport.set( 0, 0, width, height );
+			this.scissor.set( 0, 0, width, height );
+
+		},
+
+		clone: function () {
+
+			return new this.constructor().copy( this );
+
+		},
+
+		copy: function ( source ) {
+
+			this.width = source.width;
+			this.height = source.height;
+
+			this.viewport.copy( source.viewport );
+
+			this.texture = source.texture.clone();
+
+			this.depthBuffer = source.depthBuffer;
+			this.stencilBuffer = source.stencilBuffer;
+			this.depthTexture = source.depthTexture;
+
+			return this;
+
+		},
+
+		dispose: function () {
+
+			this.dispatchEvent( { type: 'dispose' } );
+
+		}
+
+	} );
+
+	/**
 	 * @author mikael emtinger / http://gomo.se/
 	 * @author alteredq / http://alteredqualia.com/
 	 * @author WestLangley / http://github.com/WestLangley
@@ -17598,6 +17686,14 @@
 
 			}
 
+			if (renderTarget.isMultiRenderTarget) {
+				for (var i = 1; i < renderTarget.attachments.length; i++) {
+					var attachmentProperties = properties.get(renderTarget.attachments[i]);
+					if (attachmentProperties.__webglTexture) _gl.deleteTexture(attachmentProperties.__webglTexture);
+					properties.remove(attachmentProperties);
+				}
+			}
+
 			if ( renderTarget.depthTexture ) {
 
 				renderTarget.depthTexture.dispose();
@@ -18186,12 +18282,39 @@
 
 			} else {
 
-				state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
-				setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
-				setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+				if (renderTarget.isMultiRenderTarget) {
+					var ext = _gl.getExtension('WEBGL_draw_buffers');
+					var drawBuffersWEBGL = [];
+					_gl.bindFramebuffer(_gl.FRAMEBUFFER, renderTargetProperties.__webglFramebuffer);
 
-				if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) _gl.generateMipmap( _gl.TEXTURE_2D );
-				state.bindTexture( _gl.TEXTURE_2D, null );
+					for (var i = 0; i < renderTarget.attachments.length; i++) {
+						var key = 'COLOR_ATTACHMENT'+i+'_WEBGL';
+						var texture = renderTarget.attachments[i];
+
+						var textureProps = properties.get( texture );
+						textureProps.__webglTexture = _gl.createTexture();
+
+						var glFormat = utils.convert( texture.format );
+						var glType = utils.convert( texture.type );
+						state.bindTexture( _gl.TEXTURE_2D, textureProps.__webglTexture );
+						setTextureParameters( _gl.TEXTURE_2D, texture, isTargetPowerOfTwo );
+						state.texImage2D( _gl.TEXTURE_2D, 0, glFormat, renderTarget.width, renderTarget.height, 0, glFormat, glType, null );
+						state.bindTexture( _gl.TEXTURE_2D, null );
+						drawBuffersWEBGL.push(ext[key]);
+						_gl.framebufferTexture2D(_gl.FRAMEBUFFER, ext[key], _gl.TEXTURE_2D, textureProps.__webglTexture, 0);
+					}
+
+					ext.drawBuffersWEBGL(drawBuffersWEBGL);
+					_gl.bindFramebuffer(_gl.FRAMEBUFFER, null);
+				} else {
+					state.bindTexture( _gl.TEXTURE_2D, textureProperties.__webglTexture );
+					setTextureParameters( _gl.TEXTURE_2D, renderTarget.texture, isTargetPowerOfTwo );
+				    setupFrameBufferTexture( renderTargetProperties.__webglFramebuffer, renderTarget, _gl.COLOR_ATTACHMENT0, _gl.TEXTURE_2D );
+
+					if ( textureNeedsGenerateMipmaps( renderTarget.texture, isTargetPowerOfTwo ) ) _gl.generateMipmap( _gl.TEXTURE_2D );
+					state.bindTexture( _gl.TEXTURE_2D, null );
+				}
+
 
 			}
 
@@ -28352,6 +28475,7 @@
 
 	exports.WebGLRenderTargetCube = WebGLRenderTargetCube;
 	exports.WebGLRenderTarget = WebGLRenderTarget;
+	exports.WebGLMultiRenderTarget = WebGLMultiRenderTarget;
 	exports.WebGLRenderer = WebGLRenderer;
 	exports.WebGL2Renderer = WebGL2Renderer;
 	exports.ShaderLib = ShaderLib;
