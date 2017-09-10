@@ -179,7 +179,7 @@ function WebGL2Renderer( parameters ) {
 		setPixelRatio: setPixelRatio,
 		setSize: setSize,
 		render: render
-	}
+	};
 
 }
 
