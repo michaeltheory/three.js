@@ -1,37 +1,33 @@
-import { REVISION, RGBAFormat, HalfFloatType, FloatType, ByteType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants';
-import { _Math } from '../math/Math';
-import { Matrix4 } from '../math/Matrix4';
-import { DataTexture } from '../textures/DataTexture';
-import { WebGLUniforms } from './webgl/WebGLUniforms';
-import { UniformsLib } from './shaders/UniformsLib';
-import { UniformsUtils } from './shaders/UniformsUtils';
-import { ShaderLib } from './shaders/ShaderLib';
-import { WebGLFlareRenderer } from './webgl/WebGLFlareRenderer';
-import { WebGLSpriteRenderer } from './webgl/WebGLSpriteRenderer';
-import { WebGLShadowMap } from './webgl/WebGLShadowMap';
-import { WebGLAttributes } from './webgl/WebGLAttributes';
-import { WebGLBackground } from './webgl/WebGLBackground';
-import { WebGLRenderLists } from './webgl/WebGLRenderLists';
-import { WebGLMorphtargets } from './webgl/WebGLMorphtargets';
-import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer';
-import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer';
-import { WebGLGeometries } from './webgl/WebGLGeometries';
-import { WebGLLights } from './webgl/WebGLLights';
-import { WebGLObjects } from './webgl/WebGLObjects';
-import { WebGLPrograms } from './webgl/WebGLPrograms';
-import { WebGLTextures } from './webgl/WebGLTextures';
-import { WebGLProperties } from './webgl/WebGLProperties';
-import { WebGLState } from './webgl/WebGLState';
-import { WebGLCapabilities } from './webgl/WebGLCapabilities';
-import { WebVRManager } from './webvr/WebVRManager';
-import { BufferGeometry } from '../core/BufferGeometry';
-import { WebGLExtensions } from './webgl/WebGLExtensions';
-import { Vector3 } from '../math/Vector3';
-// import { Sphere } from '../math/Sphere';
-import { WebGLClipping } from './webgl/WebGLClipping';
-import { Frustum } from '../math/Frustum';
-import { Vector4 } from '../math/Vector4';
-import { WebGLUtils } from './webgl/WebGLUtils';
+import { REVISION, RGBAFormat, HalfFloatType, FloatType, UnsignedByteType, FrontFaceDirectionCW, TriangleFanDrawMode, TriangleStripDrawMode, TrianglesDrawMode, NoColors, LinearToneMapping } from '../constants.js';
+import { _Math } from '../math/Math.js';
+import { Matrix4 } from '../math/Matrix4.js';
+import { DataTexture } from '../textures/DataTexture.js';
+import { WebGLUniforms } from './webgl/WebGLUniforms.js';
+import { UniformsLib } from './shaders/UniformsLib.js';
+import { UniformsUtils } from './shaders/UniformsUtils.js';
+import { ShaderLib } from './shaders/ShaderLib.js';
+import { WebGLShadowMap } from './webgl/WebGLShadowMap.js';
+import { WebGLAttributes } from './webgl/WebGLAttributes.js';
+import { WebGLBackground } from './webgl/WebGLBackground.js';
+import { WebGLRenderLists } from './webgl/WebGLRenderLists.js';
+import { WebGLMorphtargets } from './webgl/WebGLMorphtargets.js';
+import { WebGLIndexedBufferRenderer } from './webgl/WebGLIndexedBufferRenderer.js';
+import { WebGLBufferRenderer } from './webgl/WebGLBufferRenderer.js';
+import { WebGLGeometries } from './webgl/WebGLGeometries.js';
+import { WebGLLights } from './webgl/WebGLLights.js';
+import { WebGLObjects } from './webgl/WebGLObjects.js';
+import { WebGLPrograms } from './webgl/WebGLPrograms.js';
+import { WebGLTextures } from './webgl/WebGLTextures.js';
+import { WebGLProperties } from './webgl/WebGLProperties.js';
+import { WebGLState } from './webgl/WebGLState.js';
+import { WebGLCapabilities } from './webgl/WebGLCapabilities.js';
+import { BufferGeometry } from '../core/BufferGeometry.js';
+import { WebGLExtensions } from './webgl/WebGLExtensions.js';
+import { Vector3 } from '../math/Vector3.js';
+import { WebGLClipping } from './webgl/WebGLClipping.js';
+import { Frustum } from '../math/Frustum.js';
+import { Vector4 } from '../math/Vector4.js';
+import { WebGLUtils } from './webgl/WebGLUtils.js';
 
 /**
  * @author supereggbert / http://www.paulbrunt.co.uk/
@@ -246,7 +242,6 @@ function WebGLRenderer( parameters ) {
 	var programCache, renderLists;
 
 	var background, morphtargets, bufferRenderer, indexedBufferRenderer;
-	var flareRenderer, spriteRenderer;
 
 	var utils;
 
@@ -290,9 +285,6 @@ function WebGLRenderer( parameters ) {
 		bufferRenderer = new WebGLBufferRenderer( _gl, extensions, _infoRender );
 		indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, _infoRender );
 
-		flareRenderer = new WebGLFlareRenderer( _this, _gl, state, textures, capabilities );
-		spriteRenderer = new WebGLSpriteRenderer( _this, _gl, state, textures, capabilities );
-
 		_this.info.programs = programCache.programs;
 
 		_this.context = _gl;
@@ -308,9 +300,6 @@ function WebGLRenderer( parameters ) {
 
 	// vr
 
-	var vr = new WebVRManager( _this );
-
-	this.vr = vr;
 
 	// shadow map
 
@@ -372,15 +361,6 @@ function WebGLRenderer( parameters ) {
 	};
 
 	this.setSize = function ( width, height, updateStyle ) {
-
-		var device = vr.getDevice();
-
-		if ( device && device.isPresenting ) {
-
-			console.warn( 'THREE.WebGLRenderer: Can\'t change size while VR device is presenting.' );
-			return;
-
-		}
 
 		_width = width;
 		_height = height;
@@ -495,7 +475,6 @@ function WebGLRenderer( parameters ) {
 
 		renderLists.dispose();
 
-		vr.dispose();
 
 	};
 
@@ -629,6 +608,7 @@ function WebGLRenderer( parameters ) {
 			state.enableAttribute( programAttributes.normal );
 
 			_gl.vertexAttribPointer( programAttributes.normal, 3, _gl.FLOAT, false, 0, 0 );
+			console.log(0)
 
 		}
 
@@ -1012,7 +992,6 @@ function WebGLRenderer( parameters ) {
 	function start() {
 
 		if ( isAnimating ) return;
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
 		isAnimating = true;
 
 	}
@@ -1020,7 +999,6 @@ function WebGLRenderer( parameters ) {
 	function loop( time ) {
 
 		if ( onAnimationFrame !== null ) onAnimationFrame( time );
-		( vr.getDevice() || window ).requestAnimationFrame( loop );
 
 	}
 
@@ -1057,12 +1035,6 @@ function WebGLRenderer( parameters ) {
 		// update camera matrices and frustum
 
 		if ( camera.parent === null ) camera.updateMatrixWorld();
-
-		if ( vr.enabled ) {
-
-			camera = vr.getCamera( camera );
-
-		}
 
 		_projScreenMatrix.multiplyMatrices( camera.projectionMatrix, camera.matrixWorldInverse );
 		_frustum.setFromMatrix( _projScreenMatrix );
@@ -1143,9 +1115,6 @@ function WebGLRenderer( parameters ) {
 
 		// custom renderers
 
-		spriteRenderer.render( spritesArray, scene, camera );
-		flareRenderer.render( flaresArray, scene, camera, _currentViewport );
-
 		// Generate mipmap if we're using any kind of mipmap filtering
 
 		if ( renderTarget ) {
@@ -1161,12 +1130,6 @@ function WebGLRenderer( parameters ) {
 		state.buffers.color.setMask( true );
 
 		state.setPolygonOffset( false );
-
-		if ( vr.enabled ) {
-
-			vr.submitFrame();
-
-		}
 
 		// _gl.finish();
 
@@ -1229,7 +1192,7 @@ function WebGLRenderer( parameters ) {
 
 	function projectObject( object, camera, sortObjects ) {
 
-		if ( ! object.visible ) return;
+		if ( object.visible === false ) return;
 
 		var visible = object.layers.test( camera.layers );
 
@@ -1990,10 +1953,16 @@ function WebGLRenderer( parameters ) {
 
 			}
 
-			var offset = uvScaleMap.offset;
-			var repeat = uvScaleMap.repeat;
+			if ( uvScaleMap.matrixAutoUpdate === true ) {
 
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+				var offset = uvScaleMap.offset;
+				var repeat = uvScaleMap.repeat;
+				var rotation = uvScaleMap.rotation;
+				uvScaleMap.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+
+			}
+
+			uniforms.uvTransform.value.copy( uvScaleMap.matrix );
 
 		}
 
@@ -2025,10 +1994,16 @@ function WebGLRenderer( parameters ) {
 
 		if ( material.map !== null ) {
 
-			var offset = material.map.offset;
-			var repeat = material.map.repeat;
+			if ( material.map.matrixAutoUpdate === true ) {
 
-			uniforms.offsetRepeat.value.set( offset.x, offset.y, repeat.x, repeat.y );
+				var offset = material.map.offset;
+				var repeat = material.map.repeat;
+				var rotation = material.map.rotation;
+				material.map.matrix.setUvTransform( offset.x, offset.y, repeat.x, repeat.y, rotation, 0.5, 0.5 );
+
+			}
+
+			uniforms.uvTransform.value.copy( material.map.matrix );
 
 		}
 

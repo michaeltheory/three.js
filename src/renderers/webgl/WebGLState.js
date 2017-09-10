@@ -402,14 +402,21 @@ function WebGLState( gl, extensions, utils ) {
 
 	}
 
+	var __forceAttrib = '_force';
+
 	function enableAttribute( attribute ) {
 
 		newAttributes[ attribute ] = 1;
+
+		if (enabledAttributes[attribute+__forceAttrib]) {
+            gl.enableVertexAttribArray(attribute);
+        }
 
 		if ( enabledAttributes[ attribute ] === 0 ) {
 
 			gl.enableVertexAttribArray( attribute );
 			enabledAttributes[ attribute ] = 1;
+			if (window.Gvr && window.Gvr.enabled) enabledAttributes[ attribute+__forceAttrib] = 1;
 
 		}
 
