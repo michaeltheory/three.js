@@ -4,8 +4,8 @@
 		<title>three.js webvr - roller coaster</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-		<!-- Origin Trial Token, feature = WebVR (For Chrome M59+), origin = https://threejs.org, expires = 2017-07-28 -->
-		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M59+)" data-expires="2017-07-28" content="Ave6CPNUgSwHb3vCbyd55P/R7pfkwNniUJsYfSoUqI+l1X1BIOt6HfriVP0g2hmaG7Pp3qaUXuXdZeqGBmoMKg8AAABNeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMSIsImV4cGlyeSI6MTUwMTI2NzQwNX0=">
+		<!-- Origin Trial Token, feature = WebVR (For Chrome M62+), origin = https://threejs.org, expires = 2018-01-21 -->
+		<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-01-21" content="Ap+tmQjuEXRrzmu+ZuReB/eY8fZmTEOybJ2hME1RgEZAPzhZ4/IAKEHRebiTp6o4LoZOMBexL4GAL7flIkAUlQYAAABQeyJvcmlnaW4iOiJodHRwczovL3RocmVlanMub3JnOjQ0MyIsImZlYXR1cmUiOiJXZWJWUjEuMU02MiIsImV4cGlyeSI6MTUxNjUzODYxMX0=">
 		<style>
 			body {
 				margin: 0px;
@@ -29,23 +29,18 @@
 
 		<script>
 
-			WEBVR.checkAvailability().catch( function( message ) {
+			var renderer = new THREE.WebGLRenderer( { antialias: true } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			renderer.vr.enabled = true;
+			document.body.appendChild( renderer.domElement );
 
-				document.body.appendChild( WEBVR.getMessageContainer( message ) );
-
-			} );
+			document.body.appendChild( WEBVR.createButton( renderer ) );
 
 			//
 
-			var renderer = new THREE.WebGLRenderer( { antialias: true } );
-			renderer.setClearColor( 0xf0f0ff );
-			renderer.setPixelRatio( window.devicePixelRatio );
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
-
-			renderer.vr.enabled = true;
-
 			var scene = new THREE.Scene();
+			scene.background = new THREE.Color( 0xf0f0ff );
 
 			var light = new THREE.HemisphereLight( 0xfff0f0, 0x606066 );
 			light.position.set( 1, 1, 1 );
@@ -60,7 +55,7 @@
 			// environment
 
 			var geometry = new THREE.PlaneBufferGeometry( 500, 500, 15, 15 );
-			geometry.applyMatrix( new THREE.Matrix4().makeRotationX( - Math.PI / 2 ) );
+			geometry.rotateX( - Math.PI / 2 );
 
 			var positions = geometry.attributes.position.array;
 			var vertex = new THREE.Vector3();
@@ -185,16 +180,6 @@
 			scene.add( mesh );
 
 			funfairs.push( mesh );
-
-			//
-
-			WEBVR.getVRDisplay( function ( display ) {
-
-				renderer.vr.setDevice( display );
-
-				document.body.appendChild( WEBVR.getButton( display, renderer.domElement ) );
-
-			} );
 
 			//
 
