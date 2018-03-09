@@ -344,6 +344,10 @@ Object.assign( Euler.prototype, {
 
 	},
 
+	toJSON: function() {
+		return {x: this._x, y: this._y, z: this._z};
+	},
+
 	onChangeCallback: function () {}
 
 } );

@@ -443,24 +443,29 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 	},
 
-	getWorldPosition: function ( optionalTarget ) {
+	getWorldPosition: function ( ) {
 
-		var result = optionalTarget || new Vector3();
+		var output = new Vector3();
 
-		this.updateMatrixWorld( true );
+		return function getWorldPosition( optionalTarget ) {
+            var result = optionalTarget || output;
 
-		return result.setFromMatrixPosition( this.matrixWorld );
+            this.updateMatrixWorld(true);
 
-	},
+            return result.setFromMatrixPosition(this.matrixWorld);
+        }
+
+	}(),
 
 	getWorldQuaternion: function () {
 
 		var position = new Vector3();
 		var scale = new Vector3();
+		var output = new Quaternion();
 
 		return function getWorldQuaternion( optionalTarget ) {
 
-			var result = optionalTarget || new Quaternion();
+			var result = optionalTarget || output;
 
 			this.updateMatrixWorld( true );
 
@@ -475,10 +480,11 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 	getWorldRotation: function () {
 
 		var quaternion = new Quaternion();
+		var output = new Euler();
 
 		return function getWorldRotation( optionalTarget ) {
 
-			var result = optionalTarget || new Euler();
+			var result = optionalTarget || output;
 
 			this.getWorldQuaternion( quaternion );
 
@@ -492,10 +498,11 @@ Object3D.prototype = Object.assign( Object.create( EventDispatcher.prototype ), 
 
 		var position = new Vector3();
 		var quaternion = new Quaternion();
+		var output = new Vector3();
 
 		return function getWorldScale( optionalTarget ) {
 
-			var result = optionalTarget || new Vector3();
+			var result = optionalTarget || output;
 
 			this.updateMatrixWorld( true );
 

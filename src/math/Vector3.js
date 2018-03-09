@@ -722,6 +722,10 @@ Object.assign( Vector3.prototype, {
 
 		return this;
 
+	},
+
+	toJSON: function() {
+		return {x: this.x, y: this.y, z: this.z};
 	}
 
 } );

@@ -596,6 +596,10 @@ Object.assign( Quaternion.prototype, {
 
 	},
 
+	toJSON: function() {
+		return {x: this._x, y: this._y, z: this._z, w: this._w};
+	},
+
 	onChange: function ( callback ) {
 
 		this.onChangeCallback = callback;

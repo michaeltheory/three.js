@@ -81,6 +81,5 @@ export { Vector2 } from './math/Vector2.js';
 export { Quaternion } from './math/Quaternion.js';
 export { Color } from './math/Color.js';
 export { ImmediateRenderObject } from './extras/objects/ImmediateRenderObject.js';
-export { SceneUtils } from './extras/SceneUtils.js';
 export { WebGLUtils } from './renderers/webgl/WebGLUtils.js';
 export * from './constants.js';

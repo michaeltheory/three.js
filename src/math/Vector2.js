@@ -485,6 +485,10 @@ Object.assign( Vector2.prototype, {
 
 		return this;
 
+	},
+
+	toJSON: function() {
+		return {x: this.x, y: this.y};
 	}
 
 } );
